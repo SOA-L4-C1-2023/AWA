@@ -9,6 +9,8 @@
 #define SERIAL_BAUDS 9600
 #define MAX_STATES                    4
 #define MAX_EVENTS                    10
+#define STATE_FIRST 0
+#define MIN_EVENTS 0
 
 #define SERIAL_DEBUG_ENABLED 1
 
@@ -67,7 +69,9 @@ const int MEASUREMENT_ERROR_ALLOWED_CM = 2;
 const int LOW_WATER_LEVEL   =  100 ;
 const int EXPECTED_WATER_LEVEL   =  250 ;
 const int HIGH_WATER_LEVEL   =  290 ;
+const int TANK_DEPTH = 300;
 
+const int TIMER_CERO = 0;
 
 const int SERVO_1_PIN      =    8 ;
 const int WATER_GATE_OPENING_ANGLE = 90;
@@ -181,7 +185,7 @@ void state_machine()
 {
   get_new_event();
 
-  if( (new_event >= 0) && (new_event < MAX_EVENTS) && (current_state >= 0) && (current_state < MAX_STATES) )
+  if( (new_event >= MIN_EVENTS) && (new_event < MAX_EVENTS) && (current_state >= STATE_FIRST) && (current_state < MAX_STATES) )
   {
     if( new_event != EV_CONT )
     {
@@ -274,7 +278,7 @@ void get_new_event_gate_opened(double actual_water_distance, double actual_water
     new_event = EV_EXPECTED_WATER_LEVEL;
   } else if(actual_water_flow < MIN_FLOW_EXPECTED)
   { 
-    if (pump_timer != NULL && pump_timer != 0)
+    if (pump_timer != NULL && pump_timer != TIMER_CERO)
     {
       new_event = EV_HOT_PUMP;
     } else {
@@ -290,7 +294,7 @@ void get_new_event_pressurized_load(double actual_water_distance, double actual_
   if(actual_water_distance >= EXPECTED_WATER_LEVEL) 
   { 
     new_event = EV_EXPECTED_WATER_LEVEL;
-  } else if ( pump_timer != NULL && pump_timer != 0 && current_time - pump_timer >= PUMP_TIMEOUT) 
+  } else if ( pump_timer != NULL && pump_timer != TIMER_CERO && current_time - pump_timer >= PUMP_TIMEOUT) 
   {
     new_event = EV_PUMP_TIMEOUT;
   } else if(actual_water_flow < MIN_WATER_PUMP_FLOW)
@@ -306,10 +310,10 @@ void get_new_event_suspended_load(double actual_water_distance, double actual_wa
   if (actual_water_flow > MIN_FLOW_EXPECTED)
   {
     new_event = EV_SERVICE_UP;
-  } else if ( pump_timer != NULL && pump_timer != 0 && current_time - pump_timer >= PUMP_TIMEOUT) 
+  } else if ( pump_timer != NULL && pump_timer != TIMER_CERO && current_time - pump_timer >= PUMP_TIMEOUT) 
   {
     new_event = EV_PUMP_TIMEOUT;
-  } else if ( pump_timer == NULL && service_timer != NULL && service_timer != 0 && current_time - service_timer >= SERVICE_TIMEOUT) 
+  } else if ( pump_timer == NULL && service_timer != NULL && service_timer != TIMER_CERO && current_time - service_timer >= SERVICE_TIMEOUT) 
   {
     new_event = EV_SERVICE_TIMEOUT;
   } else {
@@ -345,7 +349,7 @@ double get_distance_to_the_water()
   
   
   double duracion  = pulseIn(DIST_SENSOR_ECHO,HIGH);
-  double distancia = 300 - (duracion/SOUND_SPEED);
+  double distancia = TANK_DEPTH - (duracion/SOUND_SPEED);
   
   return distancia;
   
@@ -511,23 +515,23 @@ void setup_pump_timer()
 //LEDS
 void turn_on_green_led() // Nivel de agua "esperado"
 {
-  color_timeout( 0, 255, 0);
+  color_timeout( LOW, HIGH, LOW);
 }
 void turn_on_yellow_led() // Nivel de agua "bajo"
 {
-  color_timeout( 255, 255, 0);
+  color_timeout( HIGH, HIGH, LOW);
 }
 void turn_on_red_led() // Sin suministro, creo
 {
-  color_timeout( 255, 0, 0);
+  color_timeout( HIGH, LOW, LOW);
 }
 void turn_on_blue_led() // Bomba, en enfriamiento
 {
-  color_timeout( 0, 0, 255);
+  color_timeout( LOW, LOW, HIGH);
 }
 void turn_on_white_led() // Algo dió error
 {
-  color_timeout( 255, 255, 255);
+  color_timeout( HIGH, HIGH, HIGH);
 }
 
 //-----------------------------------------------------
