@@ -43,6 +43,9 @@ const int LED_RED_PIN   =    5;
 const int LED_BLUE_PIN  =   6;
 const int LED_GREEN_PIN =   7;
 
+const int ON = 255;
+const int OFF = 0;
+
 //HCSR04
 const int DIST_SENSOR_TRIG = 2;
 const int DIST_SENSOR_ECHO = 3;
@@ -487,23 +490,23 @@ void setup_flow_timer()
 //LEDS
 void turn_on_green_led() // Nivel de agua "esperado"
 {
-  color_timeout( LOW, HIGH, LOW);
+  color_timeout( OFF, ON, OFF);
 }
 void turn_on_yellow_led() // Nivel de agua "bajo"
 {
-  color_timeout( HIGH, HIGH, LOW);
+  color_timeout( ON, ON, OFF);
 }
 void turn_on_red_led() // Sin suministro, creo
 {
-  color_timeout( HIGH, LOW, LOW);
+  color_timeout( ON, OFF, OFF);
 }
 void turn_on_blue_led() // Bomba, en enfriamiento
 {
-  color_timeout( LOW, LOW, HIGH);
+  color_timeout( OFF, OFF, ON);
 }
 void turn_on_white_led() // Algo dió error
 {
-  color_timeout( HIGH, HIGH, HIGH);
+  color_timeout( ON, ON, ON);
 }
 
 //-----------------------------------------------------
