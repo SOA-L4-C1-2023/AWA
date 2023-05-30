@@ -38,9 +38,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if(checkPermissions()){
-            //Do Something...
+            enableComponent();
         }
 
+    }
+
+    protected void enableComponent() {
+        //Primero veo si soporta BT
+        if(mBluetoothAdapter == null){
+            //showUnsupported(); -->Esto es un metodo de nosotros
+        }else {
+            //Hacer algo
+        }
     }
 
     private boolean checkPermissions() {
@@ -51,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
-
 
         for (String p:permissions) {
             result = ContextCompat.checkSelfPermission(this,p);
@@ -66,3 +74,4 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 }
+
