@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             filter.addAction(BluetoothDevice.ACTION_FOUND);
             filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
             filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            registerReceiver(mReciber,filter);
+            registerReceiver(mReceiver,filter);
         }
     }
 
