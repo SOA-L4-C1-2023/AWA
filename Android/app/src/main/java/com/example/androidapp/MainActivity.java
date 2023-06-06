@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.Manifest;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,16 +27,19 @@ public class MainActivity extends AppCompatActivity {
     //con solo solicitarlos en el Manifest es suficiente
     String[] permissions= new String[]{
             Manifest.permission.BLUETOOTH,
-            Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.READ_EXTERNAL_STORAGE};
+            Manifest.permission.BLUETOOTH_ADMIN};
+            //Manifest.permission.ACCESS_COARSE_LOCATION,
+            //Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            //Manifest.permission.READ_PHONE_STATE,
+            //Manifest.permission.READ_EXTERNAL_STORAGE};
+    private TextView txtResultadoEstado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        txtResultadoEstado = (TextView) findViewById(R.id.txtResultadoEstado);
 
         if(checkPermissions()){
             enableComponent();
@@ -46,10 +50,18 @@ public class MainActivity extends AppCompatActivity {
     protected void enableComponent() {
         //Primero veo si soporta BT
         if(mBluetoothAdapter == null){
-            //showUnsupported(); -->Esto es un metodo de nosotros
+            showUnsupported();
         }else {
-            //Hacer algo
+            showSupported();
         }
+    }
+
+    private void showSupported() {
+        txtResultadoEstado.setText("BT soportado");
+    }
+
+    private void showUnsupported() {
+        txtResultadoEstado.setText("BT no soportado");
     }
 
     private boolean checkPermissions() {
