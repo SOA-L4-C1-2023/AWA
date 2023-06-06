@@ -20,8 +20,8 @@
         android:id="@+id/txtEstado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="98dp"
-        android:layout_marginBottom="319dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="336dp"
         android:text="Estado:"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -30,9 +30,21 @@
         android:id="@+id/txtResultadoEstado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="145dp"
-        android:layout_marginBottom="319dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginBottom="336dp"
         android:text="Waiting"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Switch
+        android:id="@+id/swBomba"
+        android:layout_width="94dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="256dp"
+        android:layout_marginBottom="328dp"
+        android:text="Bomba"
+        android:textOff="Apagada"
+        android:textOn="Encendida"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

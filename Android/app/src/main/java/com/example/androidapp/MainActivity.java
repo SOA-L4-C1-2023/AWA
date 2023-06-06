@@ -6,6 +6,10 @@ import androidx.core.content.ContextCompat;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,9 +54,20 @@ public class MainActivity extends AppCompatActivity {
     protected void enableComponent() {
         //Primero veo si soporta BT
         if(mBluetoothAdapter == null){
-            showUnsupported();
+            showUnsupported(); //Aca no soporta el celu el BT
         }else {
-            showSupported();
+
+            if(mBluetoothAdapter.isEnabled()){
+                showSupported(); //Si lo soporta...
+            } else {
+                showUnsupported();
+            }
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+            filter.addAction(BluetoothDevice.ACTION_FOUND);
+            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+            registerReceiver(mReciber,filter);
         }
     }
 
@@ -85,5 +100,62 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver(){
+        public void onReceive(Context context, Intent intent) {
+
+            //Atraves del Intent obtengo el evento de Bluethoot que informo el broadcast del SO
+            String action = intent.getAction();
+
+            //Si cambio de estado el Bluethoot(Activado/desactivado)
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action))
+            {
+                //Obtengo el parametro, aplicando un Bundle, que me indica el estado del Bluethoot
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+
+                //Si esta activado
+                if (state == BluetoothAdapter.STATE_ON)
+                {
+                    //showToast("Activar");
+
+                    //showEnabled();
+                }
+            }
+            //Si se inicio la busqueda de dispositivos bluethoot
+            else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
+            {
+                //Creo la lista donde voy a mostrar los dispositivos encontrados
+                mDeviceList = new ArrayList<BluetoothDevice>();
+
+                //muestro el cuadro de dialogo de busqueda
+                //mProgressDlg.show();
+            }
+            //Si finalizo la busqueda de dispositivos bluethoot
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
+            {
+                //se cierra el cuadro de dialogo de busqueda
+               // mProgressDlg.dismiss();
+
+                //se inicia el activity DeviceListActivity pasandole como parametros, por intent,
+                //el listado de dispositovos encontrados
+                //Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
+
+                //newIntent.putParcelableArrayListExtra("device.list", mDeviceList);
+
+                //startActivity(newIntent);
+            }
+            //si se encontro un dispositivo bluethoot
+            else if (BluetoothDevice.ACTION_FOUND.equals(action))
+            {
+                //Se lo agregan sus datos a una lista de dispositivos encontrados
+                //BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                //mDeviceList.add(device);
+                //showToast("Dispositivo Encontrado:" + device.getName());
+            }
+        }
+    };
 }
+
+
 
