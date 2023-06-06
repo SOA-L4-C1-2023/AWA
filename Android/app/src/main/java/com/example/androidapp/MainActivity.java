@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 //Si esta activado
                 if (state == BluetoothAdapter.STATE_ON)
                 {
-                    //showToast("Activar");
+                    showToast("Activar");
 
                     //showEnabled();
                 }
