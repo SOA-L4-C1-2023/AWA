@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.Manifest;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,6 +156,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
 }
 
 
