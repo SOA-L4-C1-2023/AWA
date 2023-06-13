@@ -10,7 +10,7 @@ SoftwareSerial BT(10,11);
 //constantes
 #define SERIAL_BAUDS 9600
 #define MAX_STATES                    4
-#define MAX_EVENTS                    9
+#define MAX_EVENTS                    10
 #define STATE_FIRST 0
 #define MIN_EVENTS 0
 
@@ -61,14 +61,14 @@ const int MIN_ANALOG_VALUE = 0;
 const int MAX_FLOW_VALUE  = 100;
 const int MIN_FLOW_VALUE  = 0;
 const float MIN_WATER_PUMP_FLOW = 0.2;
-const float MIN_FLOW_EXPECTED = 0.3;
+const float MIN_FLOW_EXPECTED = 1;
 
 const int FLOWMETER_PIN = 2;
 const int measureInterval = 2500;
 volatile int pulseConter;
  
 // YF-S201
-const float factorK = 7.5;
+const float factorK = 3;
 
 //Sensor de ultrasonido
 //velocidad del sonido, en microsegundos por centímetros
@@ -90,12 +90,10 @@ const int WATER_GATE_CLOSE_ANGLE = 0;
 const int RELAY_PIN = 12;
 const int SERVO_TIMEOUT = 15; // MILLISECONDS
 const int TIMEOUT = 50;
-const int PUMP_TIMEOUT = 16000; // SECONDS
+const int PUMP_TIMEOUT = 8000; // SECONDS
 const int SERVICE_TIMEOUT = 2500; // SECONDS
-const int FLOW_TIMEOUT = 10; // MILLISECONDS
-//-----------
-
-Servo servo_1;
+const int FLOW_TIMEOUT = 2000; // MILLISECONDS
+const int TEST_TIMEOUT = 3000; // MILLISECONDS
 //------------------------------------------------------------
 
   // functions
@@ -135,7 +133,9 @@ Servo servo_1;
   void setup_service_test_timer(); // Inicializa el timer para salir del estado sin servicio a ver si hay agua
   void drop_service_test_timer(); // Cancela el timer para salir del estado sin servicio a ver si hay agua, puesto que se salió por otros medios
   void drop_pump_timer(); // In the case that the pump is being running for only so long, but the caudal gets too low. It drops the heating pump timer
-  void setup_pump_timer(); // Inicializa el timer para apagar la bomba después de X segundos de funcionamiento.
+  void setup_pump_timer(); // Inicializa el timer para apagar la bomba después de X segundos de funcionamiento.sto que se salió por otros medios
+  void drop_test_timer(); // In the case that the pump is being running for only so long, to test the water supply and there is no supply.
+  void setup_test_timer(); // Inicializa el timer para apagar la bomba después de X segundos de funcionamiento para testear flujo.
   void test_service(); // Arranca la bomba a ver si hay presión
 
 //States
@@ -145,19 +145,19 @@ enum states last_state;
 
 //Events
 enum events          { 
-    EV_CONT  ,  EV_EXPECTED_WATER_LEVEL ,  EV_NO_PRESSURE ,  EV_HOT_PUMP ,  EV_PRESSURE ,  EV_SERVICE_TIMEOUT ,  EV_PUMP_TIMEOUT ,  EV_FLOW_TIMEOUT,   EV_UNKNOWN
+    EV_CONT  ,  EV_EXPECTED_WATER_LEVEL ,  EV_NO_PRESSURE ,  EV_HOT_PUMP ,  EV_PRESSURE ,  EV_SERVICE_TIMEOUT ,  EV_PUMP_TIMEOUT ,  EV_FLOW_TIMEOUT,  EV_TEST_TIMEOUT,   EV_UNKNOWN
   } new_event;
 String events_s [] = { 
-    "EV_CONT", "EV_EXPECTED_WATER_LEVEL", "EV_NO_PRESSURE", "EV_HOT_PUMP", "EV_PRESSURE", "EV_SERVICE_TIMEOUT", "EV_PUMP_TIMEOUT", "EV_FLOW_TIMEOUT", "EV_UNKNOWN" 
+    "EV_CONT", "EV_EXPECTED_WATER_LEVEL", "EV_NO_PRESSURE", "EV_HOT_PUMP", "EV_PRESSURE", "EV_SERVICE_TIMEOUT", "EV_PUMP_TIMEOUT", "EV_FLOW_TIMEOUT",  "EV_TEST_TIMEOUT", "EV_UNKNOWN" 
   };
 enum events last_event;
 
 transition state_table_actions[MAX_STATES][MAX_EVENTS] =
 {
-  {show_level, finish_load       , start_load             , start_load         , start_load         , error       , drop_pump_timer       , drop_flow_timer, error } , // state ST_GATE_CLOSED
-  {none      , finish_load, start_presurized_load  , handle_hot_pump    , none               , error       , drop_pump_timer       , drop_flow_timer, error } , // state ST_GATE_OPENED
-  {none      , finish_load, handle_service_down    , handle_service_down, none               , error       , start_pump_cooldown   , drop_flow_timer, error } , // state ST_PRESSURIZED_LOAD
-  {none      , finish_load, none                   , none               , start_load         , test_service, start_presurized_load , drop_flow_timer, error } , // state ST_SUSPENDED_LOAD
+  {show_level, finish_load, start_load             , start_load         , start_load         , error       , drop_pump_timer       , drop_flow_timer,  drop_test_timer, error } , // state ST_GATE_CLOSED
+  {none      , finish_load, start_presurized_load  , handle_hot_pump    , none               , error       , drop_pump_timer       , drop_flow_timer,  drop_test_timer, error } , // state ST_GATE_OPENED
+  {none      , finish_load, handle_service_down    , handle_service_down, none               , error       , start_pump_cooldown   , drop_flow_timer,  drop_test_timer, error } , // state ST_PRESSURIZED_LOAD
+  {none      , finish_load, none                   , none               , start_load         , test_service, start_presurized_load , drop_flow_timer,  drop_test_timer, error } , // state ST_SUSPENDED_LOAD
 };
 
 bool timeout;
@@ -166,6 +166,7 @@ long service_timer;
 long pump_timer;
 long servo_timer;
 long flow_timer;
+long test_timer;
 float previous_water_flow = 0;
 double previous_water_distance = 0;
 //Variables de tiempo de LEDs
@@ -176,6 +177,12 @@ long current_time_PUMP_2;
 long current_time_PUMP_10;
 int waiting_time_PUMP_2=2;
 int waiting_time_PUMP_10=10;
+int solenoideActivate = 1;
+long timer_solenoide = 0;
+long timer_actual;
+const int FM_REFRESH_RATE = 2000; // ms
+int lastRefreshTime = 0;
+int lastFlow = 0;
 //-----------------------------------------------------
 
 void setup()
@@ -251,6 +258,9 @@ void get_new_event()
   DebugPrint("Get new event");
   double actual_water_distance = TANK_DEPTH - get_distance_to_the_water();
   double actual_water_flow = get_water_flow();
+  //Serial.print("WATERFLOW:\n");
+  //Serial.print(actual_water_flow);
+  //Serial.print("--------\n");
   long current_time = millis();
 
   check_bluetooth();
@@ -266,6 +276,9 @@ void get_new_event()
   } else if ( service_timer != NULL && service_timer != TIMER_CERO && current_time - service_timer >= SERVICE_TIMEOUT ) 
   {
     new_event = EV_SERVICE_TIMEOUT;
+  } else if ( test_timer != NULL && test_timer != TIMER_CERO && current_time - test_timer >= TEST_TIMEOUT ) 
+  {
+    new_event = EV_TEST_TIMEOUT;
   } else if (flow_timer != NULL && flow_timer != TIMER_CERO) {
     new_event = EV_CONT;
   } else
@@ -275,12 +288,17 @@ void get_new_event()
       if (pump_timer != NULL && pump_timer != TIMER_CERO) 
       {
         new_event = EV_HOT_PUMP; // EV_LWL_LP_HP
-      } else 
+      } else if (test_timer != NULL && test_timer != TIMER_CERO)
+      {
+        new_event = EV_CONT;
+      } else
       {
         new_event = EV_NO_PRESSURE; // EV_LWL_LP
-      }
+      } 
     } else 
     {
+      Serial.print("-----------------");
+      Serial.print(actual_water_flow);
       new_event = EV_PRESSURE;
     }
   }
@@ -293,28 +311,33 @@ void get_new_event()
 //Read flowmeter(potentiometer) and return value
 float get_water_flow()
 {
-  float frequency = GetFrequency();
- 
-   // calcular caudal L/min
-   float flow_Lmin = frequency / factorK;
-  return flow_Lmin;
+  if( millis() - lastRefreshTime >= FM_REFRESH_RATE ){
+    noInterrupts(); // desactivo las interrupciones para poder leer.
+    lastFlow = pulseConter * 1000 / FM_REFRESH_RATE;
+    lastFlow = lastFlow / factorK ; 
+    pulseConter = 0;
+    interrupts(); // vuelvo a capturar las interrupciones para contar nuevamente.
+    lastRefreshTime = millis();
+    Serial.print("Nuevo Flujo: ");
+    Serial.print(lastFlow);
+    Serial.println("L/min");
+  }
+  else{
+    if( millis() - lastRefreshTime >= FM_REFRESH_RATE/3)
+    {
+      Serial.print("Flujo Anterior: ");
+      Serial.print(lastFlow);
+      Serial.println("L/min");
+    }
+  }
+  return lastFlow;
 }
-//-----------------------------------------------------
+
 void ISRCountPulse()
 {
    pulseConter++;
 }
- 
-float GetFrequency()
-{
-   pulseConter = 0;
- 
-   interrupts();
-   delay(measureInterval);
-   noInterrupts();
- 
-   return (float)pulseConter * 1000 / measureInterval;
-}
+//-----------------------------------------------------
 //-----------------------------------------------------
 //Esta bien definir las variables adentro? sacar afuera
 double get_distance_to_the_water()
@@ -393,7 +416,7 @@ void error()
     stop_water_pump();
   }
   drop_service_test_timer();
-  close_water_gate();
+ // close_water_gate();
   turn_on_white_led();
   current_state = ST_GATE_CLOSED;
 }
@@ -411,7 +434,6 @@ void start_load()
     drop_service_test_timer();
   }
   setup_flow_timer();
-  open_water_gate();
   turn_on_yellow_led();
   current_state = ST_GATE_OPENED;
 }
@@ -437,6 +459,7 @@ void finish_load()
 void start_presurized_load()
 {
   DebugPrint("Start presurized load");
+  digitalWrite(SOLENOIDE,HIGH);
   start_water_pump();
   setup_flow_timer();
   setup_pump_timer();
@@ -447,6 +470,7 @@ void start_presurized_load()
 void start_pump_cooldown()
 {
   DebugPrint("Start water pump cooldown");
+  //open_water_gate();
   stop_water_pump();
   setup_flow_timer();
   setup_pump_timer();
@@ -457,6 +481,7 @@ void start_pump_cooldown()
 void handle_hot_pump()
 {
   DebugPrint("Handle hot pump");
+  //open_water_gate();
   setup_flow_timer();
   turn_on_blue_led();
   current_state = ST_SUSPENDED_LOAD;
@@ -465,6 +490,7 @@ void handle_hot_pump()
 void handle_service_down()
 {
   DebugPrint("Handle service down");
+  //open_water_gate();
   stop_water_pump();
   drop_pump_timer();
   setup_flow_timer();
@@ -476,8 +502,10 @@ void handle_service_down()
 void test_service()
 {
   DebugPrint("Handle test servie");
+  start_water_pump();
   drop_service_test_timer();
   setup_flow_timer();
+  setup_test_timer();
   turn_on_yellow_led();
   current_state = ST_PRESSURIZED_LOAD;
 }
@@ -509,6 +537,7 @@ void setup_pump_timer()
 void drop_flow_timer() 
 {
   DebugPrint("Drop flow timer");
+  //open_water_gate();
   flow_timer = NULL;
 }
 
@@ -516,6 +545,19 @@ void setup_flow_timer()
 {
   DebugPrint("Setup flow timer");
   flow_timer = millis();
+}
+
+void drop_test_timer() 
+{
+  DebugPrint("Drop test timer");
+  //open_water_gate();
+  test_timer = NULL;
+}
+
+void setup_test_timer() 
+{
+  DebugPrint("Setup test timer");
+  test_timer = millis();
 }
 
 //-----------------------------------------------------
