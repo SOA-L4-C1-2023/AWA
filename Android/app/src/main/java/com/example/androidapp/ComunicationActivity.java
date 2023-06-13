@@ -2,6 +2,7 @@ package com.example.androidapp;
 
 import static android.content.Intent.getIntent;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -42,6 +44,7 @@ public class ComunicationActivity extends Activity {
 
     // String for MAC address del Hc05
     private static String address = null;
+    private Message msg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,7 @@ public class ComunicationActivity extends Activity {
 
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onResume() {
         super.onResume();
@@ -80,7 +84,7 @@ public class ComunicationActivity extends Activity {
             }
         }
 
-        mConnectedThread = new ConnectedThread();
+        mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
         //I send a character when resuming.beginning transmission to check device is connected
         //If it is not an exception will be thrown in the write method and finish() will be called
@@ -98,7 +102,7 @@ public class ComunicationActivity extends Activity {
     }
 
     private Handler MainThreadMsgHandler(){
-        return Handler(){
+        return new Handler(){
             public void handleMessage(android.os.Message msg) //Y de donde salio esto???
             {
                 //si se recibio un msj del hilo secundario
@@ -126,6 +130,7 @@ public class ComunicationActivity extends Activity {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
+    @SuppressLint("MissingPermission")
     private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException {
         return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }

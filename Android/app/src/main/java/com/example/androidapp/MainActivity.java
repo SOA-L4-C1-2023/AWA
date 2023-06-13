@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -14,6 +15,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.Manifest;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             //Manifest.permission.READ_PHONE_STATE,
             //Manifest.permission.READ_EXTERNAL_STORAGE};
     private TextView txtResultadoEstado;
+    private Button btnConectar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         txtResultadoEstado = (TextView) findViewById(R.id.txtResultadoEstado);
-
+        btnConectar = (Button) findViewById(R.id.btnConectar);
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(checkPermissions()){
             enableComponent();
         }
@@ -57,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
         if(mBluetoothAdapter == null){
             showUnsupported(); //Aca no soporta el celu el BT
         }else {
-
             if(mBluetoothAdapter.isEnabled()){
                 showSupported(); //Si lo soporta...
+                btnConectar.setOnClickListener(btnConectarListener);
             } else {
                 showUnsupported();
             }
@@ -74,10 +79,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void showSupported() {
         txtResultadoEstado.setText("BT soportado");
+        btnConectar.setEnabled(true);
     }
 
     private void showUnsupported() {
         txtResultadoEstado.setText("BT no soportado");
+        btnConectar.setEnabled(false);
     }
 
     private boolean checkPermissions() {
@@ -160,6 +167,20 @@ public class MainActivity extends AppCompatActivity {
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
+
+    private View.OnClickListener btnConectarListener = new View.OnClickListener() {
+        @SuppressLint("MissingPermission")
+        @Override
+        public void onClick(View v) {
+            if(mBluetoothAdapter.isEnabled()){
+                mBluetoothAdapter.disable();
+                showToast("Deshabilitado");
+            }else{
+                Intent intent = new Intent(mBluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(intent, 1000);
+            }
+        }
+    };
 
 }
 
