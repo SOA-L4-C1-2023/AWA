@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 if (state == BluetoothAdapter.STATE_ON) {
                     showToast("Activar");
 
-                    //showEnabled();
+                    showEnabled();
                 }
             }
             //Si se inicio la busqueda de dispositivos bluethoot
@@ -171,10 +171,11 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("MissingPermission")
         @Override
         public void onClick(View v) {
-            mBluetoothAdapter.enable();
+            //mBluetoothAdapter.enable();
             if (mBluetoothAdapter.isEnabled()) {
-                mBluetoothAdapter.disable();
                 showToast("Deshabilitado");
+                mBluetoothAdapter.disable();
+
             }else{
                 Intent intent = new Intent(mBluetoothAdapter.ACTION_REQUEST_ENABLE);
                 showToast("OK");
