@@ -12,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -45,18 +47,21 @@ public class ComunicationActivity extends Activity {
     // String for MAC address del Hc05
     private static String address = null;
     private Message msg;
+    private Button btnConectar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main); ->Modificar por el layout correspondiente
+        setContentView(R.layout.activity_main); //->Modificar por el layout correspondiente
 
         //obtengo el adaptador del bluethoot
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         //defino el Handler de comunicacion entre el hilo Principal y el secundario.
         //El hilo secundario va a mostrar informacion al layout atraves utilizando indeirectamente a este handler
         bluetoothIN = MainThreadMsgHandler();
-
+        //Bindeo el boton conectar acá
+        btnConectar=(Button)findViewById(R.id.btnConectar);
+        btnConectar.setOnClickListener(btnConectarListener);
     }
 
     @SuppressLint("MissingPermission")
@@ -66,7 +71,7 @@ public class ComunicationActivity extends Activity {
         //Obtengo el parametro, aplicando un Bundle, que me indica la Mac Adress del HC05
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
-        address = extras.getString("DireccionBT");
+        address = "8c:f1:12:42:65:55"; //extras.getString("DireccionBT"); //->Aca meter la MAC del HC05
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
         try {
             btSocket = createBTSocket(device);
@@ -99,6 +104,15 @@ public class ComunicationActivity extends Activity {
         }catch(IOException e){
             //Do something to catch this...
         }
+    }
+    @Override
+    public void onDestroy(){
+       super.onDestroy();
+       try{
+            btSocket.close();
+       }catch(IOException e){
+            //Sorry, ya me fui
+       }
     }
 
     private Handler MainThreadMsgHandler(){
@@ -134,6 +148,14 @@ public class ComunicationActivity extends Activity {
     private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException {
         return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }
+
+    private View.OnClickListener btnConectarListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //mConnectedThread.write("a");
+            showToast("LED Blanco encendido");
+        }
+    };
 
     /*
         Hilo secundario del Thread
