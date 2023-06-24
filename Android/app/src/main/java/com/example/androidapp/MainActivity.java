@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -40,15 +41,15 @@ public class MainActivity extends AppCompatActivity {
             //Manifest.permission.WRITE_EXTERNAL_STORAGE,
             //Manifest.permission.READ_PHONE_STATE,
             //Manifest.permission.READ_EXTERNAL_STORAGE};
-    private TextView txtResultadoEstado;
+
     private Button btnConectar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        showToast("On create andando!!!");
 
-        txtResultadoEstado = (TextView) findViewById(R.id.txtResultadoEstado);
         btnConectar = (Button) findViewById(R.id.btnConectar);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(checkPermissions()){
@@ -60,14 +61,9 @@ public class MainActivity extends AppCompatActivity {
     protected void enableComponent() {
         //Primero veo si soporta BT
         if(mBluetoothAdapter == null){
-            showUnsupported(); //Aca no soporta el celu el BT
+            showUnsupported();
         }else {
-            if(mBluetoothAdapter.isEnabled()){
-                showSupported(); //Si lo soporta...
-                btnConectar.setOnClickListener(btnConectarListener);
-            } else {
-                showUnsupported();
-            }
+            checkEnabled();
             IntentFilter filter = new IntentFilter();
             filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
             filter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -77,14 +73,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showSupported() {
-        txtResultadoEstado.setText("BT soportado");
+    private void showUnsupported() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_no_bluetooth, null);
+        builder.setView(dialogView);
+
+        Button btnClose = dialogView.findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // Cierra la aplicación
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showDisabled() {
+
+        btnConectar.setEnabled(false);
+
+    }
+
+    private void showEnabled() {
         btnConectar.setEnabled(true);
     }
 
-    private void showUnsupported() {
-        txtResultadoEstado.setText("BT no soportado");
-        btnConectar.setEnabled(false);
+    private void checkEnabled() {
+        if(mBluetoothAdapter.isEnabled()){
+            showEnabled();
+            btnConectar.setOnClickListener(btnConectarListener);
+        } else {
+            showDisabled();
+        }
     }
 
     private boolean checkPermissions() {
@@ -120,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 //Obtengo el parametro, aplicando un Bundle, que me indica el estado del Bluethoot
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
-
+                checkEnabled();
                 //Si esta activado
                 if (state == BluetoothAdapter.STATE_ON)
                 {
