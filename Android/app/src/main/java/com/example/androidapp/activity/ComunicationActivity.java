@@ -1,4 +1,4 @@
-package com.example.androidapp;
+package com.example.androidapp.activity;
 
 import static android.content.Intent.getIntent;
 
