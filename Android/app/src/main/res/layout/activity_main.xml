@@ -10,19 +10,19 @@
         android:id="@+id/txtLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AWA APP"
+        android:text="@string/app_name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txtEstado"
+        android:id="@+id/lblEstado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginBottom="336dp"
-        android:text="Estado:"
+        android:layout_marginBottom="200dp"
+        android:text="@string/lblEstado"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -31,31 +31,63 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="80dp"
-        android:layout_marginBottom="336dp"
-        android:text="Waiting"
+        android:layout_marginBottom="200dp"
+        android:text="@string/txtResultadoEstado"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Switch
-        android:id="@+id/swBomba"
-        android:layout_width="94dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="288dp"
-        android:layout_marginBottom="324dp"
-        android:text="Bomba"
-        android:textOff="Apagada"
-        android:textOn="Encendida"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <ImageButton
+        android:id="@+id/imgApagarBomba"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="312dp"
+        android:layout_marginTop="372dp"
+        android:contentDescription="@string/imgApagarBomba"
+        android:scaleType="fitStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/btn_encender" />
 
-    <Button
-        android:id="@+id/btnConectar"
+    <TextView
+        android:id="@+id/lblApagarBomba"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:layout_marginBottom="263dp"
-        android:text="Conectar a dispositivo BT"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginStart="296dp"
+        android:layout_marginTop="440dp"
+        android:text="@string/lblBomba"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imgObtenerNivelDeAgua"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="372dp"
+        android:contentDescription="@string/imgObtenerNivelDeAgua"
+        android:scaleType="fitStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/btn_nivel" />
+
+    <TextView
+        android:id="@+id/lblNivelDeAgua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="440dp"
+        android:text="@string/lblNivelDeAgua"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtResultadoNivelDeAgua"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="468dp"
+        android:text="@string/txtResultadoNivelDeAgua"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

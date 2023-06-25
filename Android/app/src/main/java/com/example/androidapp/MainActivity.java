@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         txtResultadoEstado = (TextView) findViewById(R.id.txtResultadoEstado);
         btnConectar = (Button) findViewById(R.id.btnConectar);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothAdapter.enable();
         if (checkPermissions()) {
             enableComponent();
         }
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 if (state == BluetoothAdapter.STATE_ON) {
                     showToast("Activar");
 
-                    showEnabled();
+                    //showEnabled();
                 }
             }
             //Si se inicio la busqueda de dispositivos bluethoot

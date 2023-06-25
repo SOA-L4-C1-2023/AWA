@@ -1,5 +1,6 @@
 package com.example.androidapp;
 
+import androidx.appcompat.app.AppCompatActivity;
 import static android.content.Intent.getIntent;
 
 import android.annotation.SuppressLint;
@@ -9,7 +10,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -22,23 +22,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-
-/*
-    Hilo principal de la activity
- */
-public class ComunicationActivity extends Activity {
-    //Recursos varios
-
+import android.os.Bundle;
+//Hilo Principal
+public class ComunicationActivity extends AppCompatActivity {
     //Handler
     Handler bluetoothIN;
     final int handlerState = 0; //used to identify handler message
 
-    //Variables propias
+    //Recursos del BT
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
     private StringBuilder recDataString = new StringBuilder();
 
-    //Recursos para el hilo
+    //Recursos para manejo de thread
     private ConnectedThread mConnectedThread;
 
     // SPP UUID service  - Funciona en la mayoria de los dispositivos
@@ -49,11 +45,11 @@ public class ComunicationActivity extends Activity {
     private Message msg;
     private Button btnConectar;
 
+    //Eventos Propios de la aplicación.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main); //->Modificar por el layout correspondiente
-
+        setContentView(R.layout.activity_comunication);
         //obtengo el adaptador del bluethoot
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         //defino el Handler de comunicacion entre el hilo Principal y el secundario.
@@ -66,7 +62,7 @@ public class ComunicationActivity extends Activity {
 
     @SuppressLint("MissingPermission")
     @Override
-    public void onResume() {
+    public void onResume(){
         super.onResume();
         //Obtengo el parametro, aplicando un Bundle, que me indica la Mac Adress del HC05
         Intent intent = getIntent();
@@ -88,7 +84,6 @@ public class ComunicationActivity extends Activity {
                 //Deal with this...
             }
         }
-
         mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
         //I send a character when resuming.beginning transmission to check device is connected
@@ -105,14 +100,24 @@ public class ComunicationActivity extends Activity {
             //Do something to catch this...
         }
     }
+
     @Override
     public void onDestroy(){
-       super.onDestroy();
-       try{
-            btSocket.close();
-       }catch(IOException e){
-            //Sorry, ya me fui
-       }
+        super.onDestroy();
+        try{
+            btSocket.close(); //Siempre cerrar cuando esta en pausa
+        }catch(IOException e){
+            //Do something to catch this...
+        }
+    }
+    //---------------------Recursos privados---------------------------------
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    @SuppressLint("MissingPermission")
+    private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException {
+        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }
 
     private Handler MainThreadMsgHandler(){
@@ -139,16 +144,6 @@ public class ComunicationActivity extends Activity {
             }
         };
     }
-
-    private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
-
-    @SuppressLint("MissingPermission")
-    private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException {
-        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
-    }
-
     private View.OnClickListener btnConectarListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -157,9 +152,7 @@ public class ComunicationActivity extends Activity {
         }
     };
 
-    /*
-        Hilo secundario del Thread
-    */
+    //Hilo Secundario del Thread
     private class ConnectedThread extends Thread {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
@@ -199,18 +192,16 @@ public class ComunicationActivity extends Activity {
                 }
             }
         }
-
-
-        //write method
-        public void write(String input) {
-            byte[] msgBuffer = input.getBytes();           //converts entered String into bytes
-            try {
-                mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
-            } catch (IOException e) {
-                //if you cannot write, close the application
-                showToast("La conexion fallo");
-                finish();
-            }
+    //write method
+    public void write(String input) {
+        byte[] msgBuffer = input.getBytes();           //converts entered String into bytes
+        try {
+            mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
+        } catch (IOException e) {
+            //if you cannot write, close the application
+            showToast("La conexion fallo");
+            finish();
         }
     }
+}
 }
