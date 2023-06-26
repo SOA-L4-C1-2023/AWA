@@ -1,4 +1,4 @@
-package com.example.androidapp;
+package com.example.androidapp.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import static android.content.Intent.getIntent;
@@ -49,14 +49,14 @@ public class ComunicationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comunication);
+        //setContentView(R.layout.activity_comunication);
         //obtengo el adaptador del bluethoot
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         //defino el Handler de comunicacion entre el hilo Principal y el secundario.
         //El hilo secundario va a mostrar informacion al layout atraves utilizando indeirectamente a este handler
         bluetoothIN = MainThreadMsgHandler();
         //Bindeo el boton conectar acá
-        btnConectar=(Button)findViewById(R.id.btnConectar);
+        //btnConectar=(Button)findViewById(R.id.btnConectar);
         btnConectar.setOnClickListener(btnConectarListener);
     }
 

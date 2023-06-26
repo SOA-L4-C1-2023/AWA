@@ -1,15 +1,10 @@
 <resources>
-    <string name="app_name">AWA - Control de Agua</string>
-    <string name="btnConectar">Conectar a dispositivo BT</string>
-    <string name="lblBomba">Notificar via LED</string>
-    <string name="lblEstado">Estado:</string>
-    <string name="lblNivelDeAgua">Nivel de Agua</string>
-    <string name="txtResultadoEstado">Waiting</string>
-    <string name="txtResultadoNivelDeAgua">0L</string>
-    <string name="imgApagarBomba">Apaga la bomba, independientemente del estado en el que se encuentre</string>
-    <string name="imgObtenerNivelDeAgua">Obtiene el nivel de agua del tanque</string>
-    <string name="imgLogoConexion">Imagen de conexión</string>
-    <string name="icLogoBT">Icono de Bluethoot</string>
-
-
+    <string name="app_name">Android APP</string>
+    <string name="level_msg">Gráfico de Barras</string>
+    <string name="water_level">Nivel de Agua</string>
+    <string name="water_flow">Flujo de Agua</string>
+    <string name="logo_desc">Logo de la aplicación</string>
+    <string name="bluetooth_icon">Bluetooth icon</string>
+    <string name="activar_bt">Activar Bluetooth</string>
+    <string name="desactivar_bt">Desactivar Bluetooth</string>
 </resources>
