@@ -1,5 +1,6 @@
 package com.example.androidapp.activity;
 
+import androidx.appcompat.app.AppCompatActivity;
 import static android.content.Intent.getIntent;
 
 import android.annotation.SuppressLint;
@@ -9,9 +10,10 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -20,23 +22,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-
-/*
-    Hilo principal de la activity
- */
-public class ComunicationActivity extends Activity {
-    //Recursos varios
-
+import android.os.Bundle;
+//Hilo Principal
+public class ComunicationActivity extends AppCompatActivity {
     //Handler
     Handler bluetoothIN;
     final int handlerState = 0; //used to identify handler message
 
-    //Variables propias
+    //Recursos del BT
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
     private StringBuilder recDataString = new StringBuilder();
 
-    //Recursos para el hilo
+    //Recursos para manejo de thread
     private ConnectedThread mConnectedThread;
 
     // SPP UUID service  - Funciona en la mayoria de los dispositivos
@@ -45,28 +43,31 @@ public class ComunicationActivity extends Activity {
     // String for MAC address del Hc05
     private static String address = null;
     private Message msg;
+    private Button btnConectar;
 
+    //Eventos Propios de la aplicación.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main); ->Modificar por el layout correspondiente
-
+        //setContentView(R.layout.activity_comunication);
         //obtengo el adaptador del bluethoot
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         //defino el Handler de comunicacion entre el hilo Principal y el secundario.
         //El hilo secundario va a mostrar informacion al layout atraves utilizando indeirectamente a este handler
         bluetoothIN = MainThreadMsgHandler();
-
+        //Bindeo el boton conectar acá
+        //btnConectar=(Button)findViewById(R.id.btnConectar);
+        btnConectar.setOnClickListener(btnConectarListener);
     }
 
     @SuppressLint("MissingPermission")
     @Override
-    public void onResume() {
+    public void onResume(){
         super.onResume();
         //Obtengo el parametro, aplicando un Bundle, que me indica la Mac Adress del HC05
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
-        address = extras.getString("DireccionBT");
+        address = "8c:f1:12:42:65:55"; //extras.getString("DireccionBT"); //->Aca meter la MAC del HC05
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
         try {
             btSocket = createBTSocket(device);
@@ -83,7 +84,6 @@ public class ComunicationActivity extends Activity {
                 //Deal with this...
             }
         }
-
         mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
         //I send a character when resuming.beginning transmission to check device is connected
@@ -99,6 +99,25 @@ public class ComunicationActivity extends Activity {
         }catch(IOException e){
             //Do something to catch this...
         }
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        try{
+            btSocket.close(); //Siempre cerrar cuando esta en pausa
+        }catch(IOException e){
+            //Do something to catch this...
+        }
+    }
+    //---------------------Recursos privados---------------------------------
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    @SuppressLint("MissingPermission")
+    private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException {
+        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }
 
     private Handler MainThreadMsgHandler(){
@@ -125,19 +144,15 @@ public class ComunicationActivity extends Activity {
             }
         };
     }
+    private View.OnClickListener btnConectarListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //mConnectedThread.write("a");
+            showToast("LED Blanco encendido");
+        }
+    };
 
-    private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }
-
-    @SuppressLint("MissingPermission")
-    private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException {
-        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
-    }
-
-    /*
-        Hilo secundario del Thread
-    */
+    //Hilo Secundario del Thread
     private class ConnectedThread extends Thread {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
@@ -177,18 +192,16 @@ public class ComunicationActivity extends Activity {
                 }
             }
         }
-
-
-        //write method
-        public void write(String input) {
-            byte[] msgBuffer = input.getBytes();           //converts entered String into bytes
-            try {
-                mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
-            } catch (IOException e) {
-                //if you cannot write, close the application
-                showToast("La conexion fallo");
-                finish();
-            }
+    //write method
+    public void write(String input) {
+        byte[] msgBuffer = input.getBytes();           //converts entered String into bytes
+        try {
+            mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
+        } catch (IOException e) {
+            //if you cannot write, close the application
+            showToast("La conexion fallo");
+            finish();
         }
     }
+}
 }
