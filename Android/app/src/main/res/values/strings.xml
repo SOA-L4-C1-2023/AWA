@@ -7,4 +7,9 @@
     <string name="bluetooth_icon">Bluetooth icon</string>
     <string name="activar_bt">Activar Bluetooth</string>
     <string name="desactivar_bt">Desactivar Bluetooth</string>
+    <string name="water_current_level">25%</string>
+    <string name="water_current_flow">25%</string>
+    <string name="label_turn_on">Encender</string>
+    <string name="label_pump">Bomba</string>
+
 </resources>
