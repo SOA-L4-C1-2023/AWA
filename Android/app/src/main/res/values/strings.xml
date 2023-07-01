@@ -11,5 +11,8 @@
     <string name="water_current_flow">25%</string>
     <string name="label_turn_on">Encender</string>
     <string name="label_pump">Bomba</string>
+    <string name="label_bt_warning">Debe activar bluetooth y/o conectarse al dispositivo apropiado (inicia en AWA_)</string>
+    <string name="label_close">Cerrar</string>
+    <string name="label_bt_not_supported">Lo sentimos su dispositivo no soporta Bluetooth.</string>
 
 </resources>

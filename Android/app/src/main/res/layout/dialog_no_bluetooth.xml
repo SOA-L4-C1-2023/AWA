@@ -9,10 +9,11 @@
         android:id="@+id/logo_view"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/logo_desc"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.1"
         app:srcCompat="@drawable/awa" />
 
@@ -20,16 +21,16 @@
         android:id="@+id/text_no_bluetooth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Lo sentimos su dispositivo no soporta Bluetooth."
+        android:text="@string/label_bt_not_supported"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/logo_view"
         app:layout_constraintBottom_toTopOf="@+id/btnClose"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintVertical_bias="0.2"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo_view"
+        app:layout_constraintVertical_bias="0.2"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <Button
         android:id="@+id/btnClose"
@@ -37,10 +38,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:paddingHorizontal="50dp"
-        android:text="Cerrar"
-        app:layout_constraintTop_toBottomOf="@+id/text_no_bluetooth"
+        android:text="@string/label_close"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/text_no_bluetooth" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
