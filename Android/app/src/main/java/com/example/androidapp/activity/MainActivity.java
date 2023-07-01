@@ -9,6 +9,10 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.Manifest;
 import android.provider.Settings;
@@ -45,6 +49,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         showToast("onCreate");
         checkBleutooth();
+        //Parte del sensor
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        Sensor sensorShake = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        SensorEventListener sensorEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                if(sensorEvent!=null){
+                    float x_accl = sensorEvent.values[0];
+                    float y_accl = sensorEvent.values[1];
+                    float z_accl = sensorEvent.values[2];
+
+                    if(x_accl>2 || x_accl<-2 || y_accl>2 || y_accl<-2){ //|| z_accl>2 || z_accl<-2){
+                        showToast("Shaking!");
+                    }else {
+                        showToast("Not Shaking!");
+                    }
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
+
+        sensorManager.registerListener(sensorEventListener,sensorShake,SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
