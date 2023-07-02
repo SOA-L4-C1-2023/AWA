@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AWA</string>
+    <string name="el_nivel_de_agua_actual_en_el_tanque_es_cm">El Nivel de agua actual en el tanque es: (cm)</string>
+    <string name="bienvenidos_al_sistema_awa">Bienvenidos al sistema AWA</string>
+    <string name="manual_uso">Manual de uso:\n\n
+        1- Preciona el boton Nivel de agua para obtener la cantida de agua en el tanque en cm.\n\n
+        2- Preciona el boton de notificar apra enviar una notificacion de recepcion de datos al arduino.\n\n
+        3- Genereta un shake agitando el celular para realizar la notifiacion sin precionar ningun boton</string>
+</resources>
