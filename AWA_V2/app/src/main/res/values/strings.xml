@@ -3,8 +3,8 @@
     <string name="el_nivel_de_agua_actual_en_el_tanque_es_cm">El Nivel de agua actual en el tanque es: (cm)</string>
     <string name="bienvenidos_al_sistema_awa">Bienvenidos al sistema AWA</string>
     <string name="manual_uso">Manual de uso:\n\n
-        1- Presiona el botón "Nivel de agua" para obtener la cantidad de agua en el tanque en cm.\n\n
-        2- Presiona el botón de "Notificar" para enviar una notificación de recepción de datos al Arduino.\n\n
+        1- Presiona el botón Nivel de agua para obtener la cantidad de agua en el tanque en cm.\n\n
+        2- Presiona el botón de Notificar para enviar una notificación de recepción de datos al Arduino.\n\n
         3- Agita el celular (Shake) para realizar la notificación sin presionar ningún botón</string>
     <string name="button_notificar">Notificar</string>
     <string name="button_nivel_de_agua">Nivel De Agua</string>
