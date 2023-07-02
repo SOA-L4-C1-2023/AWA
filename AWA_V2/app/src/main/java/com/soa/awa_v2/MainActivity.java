@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    //Cambiar nombre, prende led en arduino violeta
+
     private void led() {
         btnLed = findViewById(R.id.btnLed);
         btnLed.setOnClickListener(new View.OnClickListener() {

@@ -53,7 +53,7 @@ public class DispositivosVinculados extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dispositivos_vinculados);
-        checkPermissions(); // Todo: agregar esto siempre para que no rompa
+        checkPermissions();
     }
 
     @Override
