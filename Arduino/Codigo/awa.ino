@@ -1,13 +1,17 @@
 //Includes
 
 #include <Servo.h>
-#include <SoftwareSerial.h>   // Incluimos la librería  SoftwareSerial  
-SoftwareSerial BT(10,11);
+#include <SoftwareSerial.h>   // Incluimos la librería  SoftwareSerial 
 
 
 // Habilitacion de debug para la impresion por el puerto serial ...
 //----------------------------------------------
 //constantes
+#define RXPIN 10 
+#define TXPIN 11
+
+SoftwareSerial BT(RXPIN,TXPIN);
+
 #define SERIAL_BAUDS 9600
 #define MAX_STATES                    4
 #define MAX_EVENTS                    10
@@ -47,6 +51,7 @@ const int LED_GREEN_PIN =   7;
 
 const int ON = 255;
 const int OFF = 0;
+const int VIOLET = 159;
 
 //HCSR04
 const int DIST_SENSOR_TRIG = 4;
@@ -183,6 +188,7 @@ long timer_actual;
 const int FM_REFRESH_RATE = 2000; // ms
 int lastRefreshTime = 0;
 int lastFlow = 0;
+double actual_water_distance;
 //-----------------------------------------------------
 
 void setup()
@@ -226,7 +232,12 @@ void state_machine()
 void initialize_sistem()
 {
   Serial.begin(SERIAL_BAUDS);
+
+  pinMode(RXPIN, INPUT);
+  pinMode(TXPIN, OUTPUT);
+
   BT.begin(9600);  
+
   pinMode(LED_RED_PIN     , OUTPUT);
   pinMode(LED_GREEN_PIN   , OUTPUT);
   pinMode(LED_BLUE_PIN    , OUTPUT);
@@ -244,7 +255,6 @@ void initialize_sistem()
   timeout = false;
   past_time = millis();
   
-  
   current_state = ST_GATE_CLOSED;
   previous_water_distance = get_distance_to_the_water();
   previous_water_flow = get_water_flow();
@@ -256,7 +266,7 @@ void initialize_sistem()
 void get_new_event()
 {
   DebugPrint("Get new event");
-  double actual_water_distance = TANK_DEPTH - get_distance_to_the_water();
+  actual_water_distance = TANK_DEPTH - get_distance_to_the_water();
   double actual_water_flow = get_water_flow();
   //Serial.print("WATERFLOW:\n");
   //Serial.print(actual_water_flow);
@@ -318,16 +328,16 @@ float get_water_flow()
     pulseConter = 0;
     interrupts(); // vuelvo a capturar las interrupciones para contar nuevamente.
     lastRefreshTime = millis();
-    Serial.print("Nuevo Flujo: ");
-    Serial.print(lastFlow);
-    Serial.println("L/min");
+    //Serial.print("Nuevo Flujo: ");
+    //Serial.print(lastFlow);
+    //Serial.println("L/min");
   }
   else{
     if( millis() - lastRefreshTime >= FM_REFRESH_RATE/3)
     {
-      Serial.print("Flujo Anterior: ");
-      Serial.print(lastFlow);
-      Serial.println("L/min");
+      //Serial.print("Flujo Anterior: ");
+      //Serial.print(lastFlow);
+      //Serial.println("L/min");
     }
   }
   return lastFlow;
@@ -358,7 +368,6 @@ double get_distance_to_the_water()
   
   double duracion  = pulseIn(DIST_SENSOR_ECHO,HIGH);
   double distancia = (duracion/SOUND_SPEED);
-  
   return distancia;
   
 }
@@ -612,12 +621,13 @@ void check_bluetooth(){
     char message = BT.read();
     if (message == 'A')
     {
-      Color(159,0,255);//violeta, el usuario ya recibio la informacion
+      Serial.print(message);
+      Color(VIOLET,OFF,ON);//violeta, el usuario ya recibio la informacion
     }
     if (message == 'B')
     {
       char buffer[10] = "";
-      BT.write(dtostrf(get_distance_to_the_water(), 5, 3, buffer));
+      BT.println(dtostrf(actual_water_distance, 5, 3, buffer));
     }
   }
 }
