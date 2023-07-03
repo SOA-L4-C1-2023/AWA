@@ -558,8 +558,19 @@ void setup_flow_timer()
 
 void drop_test_timer() 
 {
+  int flow = get_water_flow();
   DebugPrint("Drop test timer");
-  //open_water_gate();
+  // open_water_gate();
+  if (flow > MIN_FLOW_EXPECTED)
+  {
+    DebugPrint("Test passed, start presurized load");
+    start_presurized_load();
+  }
+  else
+  {
+    DebugPrint("Test failed, handle service down");
+    handle_service_down();
+  }
   test_timer = NULL;
 }
 
