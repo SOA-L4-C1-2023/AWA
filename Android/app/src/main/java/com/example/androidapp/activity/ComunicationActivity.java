@@ -24,7 +24,8 @@ import java.io.OutputStream;
 import java.util.UUID;
 import android.os.Bundle;
 //Hilo Principal
-public class ComunicationActivity extends AppCompatActivity {
+public class ComunicationActivity extends AppCompatActivity
+{
     //Handler
     Handler bluetoothIN;
     final int handlerState = 0; //used to identify handler message
@@ -47,7 +48,8 @@ public class ComunicationActivity extends AppCompatActivity {
 
     //Eventos Propios de la aplicación.
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_comunication);
         //obtengo el adaptador del bluethoot
@@ -62,25 +64,35 @@ public class ComunicationActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     @Override
-    public void onResume(){
+    public void onResume()
+    {
         super.onResume();
         //Obtengo el parametro, aplicando un Bundle, que me indica la Mac Adress del HC05
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         address = "8c:f1:12:42:65:55"; //extras.getString("DireccionBT"); //->Aca meter la MAC del HC05
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
-        try {
+        try
+        {
             btSocket = createBTSocket(device);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             showToast("La creacion del Socket fallo");
         }
         //Suponiendo que sale todo bien por acá
-        try {
+        try
+        {
             btSocket.connect();
-        } catch (IOException e) {
-            try {
+        }
+        catch (IOException e)
+        {
+            try
+            {
                 btSocket.close();
-            } catch (IOException e2) {
+            }
+            catch (IOException e2)
+            {
                 //Deal with this...
             }
         }
@@ -92,36 +104,48 @@ public class ComunicationActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause(){
+    public void onPause()
+    {
         super.onPause();
-        try{
+        try
+        {
             btSocket.close(); //Siempre cerrar cuando esta en pausa
-        }catch(IOException e){
+        }
+        catch(IOException e)
+        {
             //Do something to catch this...
         }
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy()
+    {
         super.onDestroy();
-        try{
+        try
+        {
             btSocket.close(); //Siempre cerrar cuando esta en pausa
-        }catch(IOException e){
+        }
+        catch(IOException e)
+        {
             //Do something to catch this...
         }
     }
     //---------------------Recursos privados---------------------------------
-    private void showToast(String message) {
+    private void showToast(String message)
+    {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     @SuppressLint("MissingPermission")
-    private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException {
+    private BluetoothSocket createBTSocket(BluetoothDevice device) throws IOException
+    {
         return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }
 
-    private Handler MainThreadMsgHandler(){
-        return new Handler(){
+    private Handler MainThreadMsgHandler()
+    {
+        return new Handler()
+        {
             public void handleMessage(android.os.Message msg) //Y de donde salio esto???
             {
                 //si se recibio un msj del hilo secundario
@@ -144,42 +168,54 @@ public class ComunicationActivity extends AppCompatActivity {
             }
         };
     }
-    private View.OnClickListener btnConectarListener = new View.OnClickListener() {
+    private View.OnClickListener btnConectarListener = new View.OnClickListener()
+    {
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             //mConnectedThread.write("a");
             showToast("LED Blanco encendido");
         }
     };
 
     //Hilo Secundario del Thread
-    private class ConnectedThread extends Thread {
+    private class ConnectedThread extends Thread
+    {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
         //Constructor de la clase del hilo secundario
-        public ConnectedThread(BluetoothSocket socket) {
+        public ConnectedThread(BluetoothSocket socket)
+        {
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
-            try {
+            try
+            {
                 //Create I/O streams for connection
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) { }
+            }
+            catch (IOException e)
+            {
+
+            }
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
         }
 
         //metodo run del hilo, que va a entrar en una espera activa para recibir los msjs del HC05
-        public void run() {
+        public void run()
+        {
             byte[] buffer = new byte[256];
             int bytes;
 
             //el hilo secundario se queda esperando mensajes del HC05
-            while (true) {
-                try{
+            while (true)
+            {
+                try
+                {
                     //se leen los datos del Bluethoot
                     bytes = mmInStream.read(buffer);
                     String readMessage = new String(buffer, 0, bytes);
@@ -187,21 +223,27 @@ public class ComunicationActivity extends AppCompatActivity {
                     //se muestran en el layout de la activity, utilizando el handler del hilo
                     // principal antes mencionado
                     bluetoothIN.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     break;
                 }
             }
         }
     //write method
-    public void write(String input) {
+    public void write(String input)
+    {
         byte[] msgBuffer = input.getBytes();           //converts entered String into bytes
-        try {
+        try
+        {
             mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             //if you cannot write, close the application
             showToast("La conexion fallo");
             finish();
         }
     }
-}
+    }
 }

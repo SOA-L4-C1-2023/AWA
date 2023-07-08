@@ -25,10 +25,9 @@ import com.example.androidapp.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity
+{
     private BluetoothAdapter mBluetoothAdapter;
-
     public static final int MULTIPLE_PERMISSIONS = 10;
     private AlertDialog enableBluetoothDialog;
 
@@ -44,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btnTogglePump;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         showToast("onCreate");
@@ -52,24 +52,31 @@ public class MainActivity extends AppCompatActivity {
         //Parte del sensor
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         Sensor sensorShake = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        SensorEventListener sensorEventListener = new SensorEventListener() {
+        SensorEventListener sensorEventListener = new SensorEventListener()
+        {
             @Override
-            public void onSensorChanged(SensorEvent sensorEvent) {
-                if(sensorEvent!=null){
+            public void onSensorChanged(SensorEvent sensorEvent)
+            {
+                if(sensorEvent!=null)
+                {
                     float x_accl = sensorEvent.values[0];
                     float y_accl = sensorEvent.values[1];
                     float z_accl = sensorEvent.values[2];
 
-                    if(x_accl>2 || x_accl<-2 || y_accl>2 || y_accl<-2){ //|| z_accl>2 || z_accl<-2){
+                    if(x_accl>2 || x_accl<-2 || y_accl>2 || y_accl<-2)
+                    {
                         showToast("Shaking!");
-                    }else {
+                    }
+                    else
+                    {
                         showToast("Not Shaking!");
                     }
                 }
             }
 
             @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
+            public void onAccuracyChanged(Sensor sensor, int i)
+            {
 
             }
         };
@@ -78,42 +85,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         showToast("onResume");
         checkBleutooth();
         super.onResume();
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
         showToast("onStart");
         checkBleutooth();
         super.onStart();
     }
 
     @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
         showToast("onWindowFocusChanged");
         checkBleutooth();
         super.onWindowFocusChanged(hasFocus);
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
     }
 
     @SuppressLint("MissingPermission")
-    private void checkBleutooth() {
+    private void checkBleutooth()
+    {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (checkPermissions()) {
-            if (mBluetoothAdapter == null) {
+        if (checkPermissions())
+        {
+            if (mBluetoothAdapter == null)
+            {
                 showUnsupported();
-            } else {
-                if (mBluetoothAdapter.isEnabled()/* && mBluetoothAdapter.getName().startsWith("AWA_")*/) {
+            }
+            else
+            {
+                if (mBluetoothAdapter.isEnabled())
+                {
                     showToast("Bluetooth activado");
                     deviceConected();
-                } else {
+                }
+                else
+                {
                     showToast("Bluetooth desactivado");
                     showNotConnectedOrNotEnabled();
                 }
@@ -121,16 +140,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void deviceConected() {
+    private void deviceConected()
+    {
         btnTogglePump = findViewById(R.id.btnTogglePump);
         btnTogglePump.setOnClickListener(togglePumpListener);
-        if (enableBluetoothDialog != null && enableBluetoothDialog.isShowing()) {
+        if (enableBluetoothDialog != null && enableBluetoothDialog.isShowing())
+        {
             enableBluetoothDialog.dismiss();
         }
     }
 
-    private void showNotConnectedOrNotEnabled() {
-        if (enableBluetoothDialog != null && enableBluetoothDialog.isShowing()) {
+    private void showNotConnectedOrNotEnabled()
+    {
+        if (enableBluetoothDialog != null && enableBluetoothDialog.isShowing())
+        {
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -147,8 +170,8 @@ public class MainActivity extends AppCompatActivity {
         enableBluetoothDialog.show();
     }
 
-    private void showUnsupported() {
-
+    private void showUnsupported()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View noBluetoothView = getLayoutInflater().inflate(R.layout.dialog_no_bluetooth, null);
         builder.setView(noBluetoothView);
@@ -158,58 +181,64 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
-
     }
 
-    private boolean checkPermissions() {
+    private boolean checkPermissions()
+    {
         int result;
         List<String> listPermissionsNeeded = new ArrayList<>();
 
         //Se chequea si la version de Android es menor a la 7
 
-        for (String p : permissions) {
+        for (String p : permissions)
+        {
             result = ContextCompat.checkSelfPermission(this, p);
-            if (result != PackageManager.PERMISSION_GRANTED) {
+            if (result != PackageManager.PERMISSION_GRANTED)
+            {
                 listPermissionsNeeded.add(p);
             }
         }
-        if (!listPermissionsNeeded.isEmpty()) {
+        if (!listPermissionsNeeded.isEmpty())
+        {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MULTIPLE_PERMISSIONS);
             return false;
         }
         return true;
     }
 
-    private void showToast(String message) {
+    private void showToast(String message)
+    {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    private final View.OnClickListener activarBluetoothRequestListener = new View.OnClickListener() {
+    private final View.OnClickListener activarBluetoothRequestListener = new View.OnClickListener()
+    {
         @SuppressLint("MissingPermission")
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
             startActivity(intent);
         }
     };
 
-    private final View.OnClickListener cerrarAppListener = new View.OnClickListener() {
+    private final View.OnClickListener cerrarAppListener = new View.OnClickListener()
+    {
         @SuppressLint("MissingPermission")
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             finish();
         }
     };
 
-    private final View.OnClickListener togglePumpListener = new View.OnClickListener() {
+    private final View.OnClickListener togglePumpListener = new View.OnClickListener()
+    {
         @SuppressLint("MissingPermission")
         @Override
-        public void onClick(View v) {
+        public void onClick(View v)
+        {
             showToast("togglePumpListener");
         }
     };
-
 }
-
-
-
