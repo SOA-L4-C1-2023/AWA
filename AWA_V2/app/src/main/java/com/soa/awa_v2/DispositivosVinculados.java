@@ -27,10 +27,9 @@ import java.util.Set;
 
 
 @RequiresApi(api = Build.VERSION_CODES.S)
-public class DispositivosVinculados extends AppCompatActivity {
-
+public class DispositivosVinculados extends AppCompatActivity
+{
     public static final int MULTIPLE_PERMISSIONS = 3;
-
 
     String[] permissions = new String[]
             {
@@ -50,14 +49,16 @@ public class DispositivosVinculados extends AppCompatActivity {
     private ArrayAdapter mPairedDevicesArrayAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dispositivos_vinculados);
         checkPermissions();
     }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
         //---------------------------------------------------------------------
         checkPermissions();
@@ -68,24 +69,30 @@ public class DispositivosVinculados extends AppCompatActivity {
         IdLista.setOnItemClickListener(mDeviceClickListener);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
-
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)
+        {
             Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
 
-            if (pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
+            if (pairedDevices.size() > 0)
+            {
+                for (BluetoothDevice device : pairedDevices)
+                {
                     mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 }
             }
-        }else {
+        }
+        else
+        {
             //Si no obtengo permisos tengo que mostrar un error de que la aplicacion no funcionara de manera correcta
         }
         //---------------------------------------------------------------------
     }
 
     // Configura un (on-click) para la lista
-    private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
-        public void onItemClick(AdapterView av, View v, int arg2, long arg3) {
+    private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener()
+    {
+        public void onItemClick(AdapterView av, View v, int arg2, long arg3)
+        {
 
             // Obtener la dirección MAC del dispositivo
             String info = ((TextView) v).getText().toString();
@@ -99,18 +106,25 @@ public class DispositivosVinculados extends AppCompatActivity {
         }
     };
 
-    private void VerificarEstadoBT() {
+    private void VerificarEstadoBT()
+    {
         // Comprueba que el dispositivo tiene Bluetooth y que está encendido.
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBtAdapter == null) {
+        if (mBtAdapter == null)
+        {
             Toast.makeText(getBaseContext(), "El dispositivo no soporta Bluetooth", Toast.LENGTH_SHORT).show();
-        } else {
-            if (mBtAdapter.isEnabled()) {
+        } else
+        {
+            if (mBtAdapter.isEnabled())
+            {
                 Log.d(TAG, "...Bluetooth Activado...");
-            } else {
+            }
+            else
+            {
                 //Solicita al usuario que active Bluetooth
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED)
+                {
                     startActivityForResult(enableBtIntent, 1);
                 }
             }
@@ -118,19 +132,23 @@ public class DispositivosVinculados extends AppCompatActivity {
     }
 
 
-    private boolean checkPermissions() {
+    private boolean checkPermissions()
+    {
         int result;
         List<String> listPermissionsNeeded = new ArrayList<>();
 
         //Se chequea si la version de Android es menor a la 7
 
-        for (String p : permissions) {
+        for (String p : permissions)
+        {
             result = ContextCompat.checkSelfPermission(this, p);
-            if (result != PackageManager.PERMISSION_GRANTED) {
+            if (result != PackageManager.PERMISSION_GRANTED)
+            {
                 listPermissionsNeeded.add(p);
             }
         }
-        if (!listPermissionsNeeded.isEmpty()) {
+        if (!listPermissionsNeeded.isEmpty())
+        {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MULTIPLE_PERMISSIONS);
             return false;
         }
