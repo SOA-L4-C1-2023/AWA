@@ -319,10 +319,9 @@ float get_water_flow()
     interrupts(); // vuelvo a capturar las interrupciones para contar nuevamente.
     lastRefreshTime = millis();
   }
-  else{
-    if( millis() - lastRefreshTime >= FM_REFRESH_RATE/3)
-    {
-    }
+  else
+  {
+    
   }
   return lastFlow;
 }
@@ -367,7 +366,8 @@ void show_level()
   } else if (actual_water_distance >= LOW_WATER_LEVEL)
   {
     turn_on_green_led();
-  } else {
+  } else 
+  {
     turn_on_red_led();
   }
 }
@@ -581,7 +581,8 @@ void Color(int R, int G, int B)
      analogWrite(LED_BLUE_PIN , B) ;    // Blue 
 }
 
-void check_bluetooth(){
+void check_bluetooth()
+{
 
   if(BT.available())    // Si llega un dato por el puerto BT se envía al monitor serial
   {
