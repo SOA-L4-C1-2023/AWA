@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             }
         }
-        MyConexionBT = new ConnectedThread(btSocket);
+        MyConexionBT = new ConnectedThread(btSocket,bluetoothIn,handlerState);
         MyConexionBT.start();
         Toast.makeText(this, address, Toast.LENGTH_SHORT).show();
     }
@@ -262,79 +262,79 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     //Crea la clase que permite crear el evento de conexion
-    private class ConnectedThread extends Thread
-    {
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-
-        public ConnectedThread(BluetoothSocket socket)
-        {
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-            try
-            {
-                tmpIn = socket.getInputStream();
-                tmpOut = socket.getOutputStream();
-            }
-            catch (IOException e)
-            {
-
-            }
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-        }
-
-        public void run()
-        {
-            byte[] byte_in = new byte[50];
-            // Se mantiene en modo escucha para determinar el ingreso de datos
-            while (true)
-            {
-                try
-                {
-                    mmInStream.read(byte_in);
-                    String cadena = new String(byte_in, 0, 50);
-                    bluetoothIn.obtainMessage(handlerState, cadena).sendToTarget();
-                }
-                catch (IOException e)
-                {
-                    break;
-                }
-            }
-        }
-
-        //Envio de trama
-        public void write(String input)
-        {
-            try
-            {
-                mmOutStream.write(input.getBytes());
-            }
-            catch (IOException e)
-            {
-                //si no es posible enviar datos se cierra la conexión
-                Toast.makeText(getBaseContext(), "La Conexión fallo", Toast.LENGTH_LONG).show();
-                finish();
-            }
-        }
-
-        public String read()
-        {
-            byte[] buffer = new byte[1024];
-            try
-            {
-                int byteReads = mmInStream.read(buffer);
-                return new String(buffer, 0, byteReads);
-            }
-            catch (IOException e)
-            {
-                //si no es posible enviar datos se cierra la conexión
-                Toast.makeText(getBaseContext(), "La Conexión fallo", Toast.LENGTH_LONG).show();
-                finish();
-            }
-            return "-1";
-        }
-
-    }
+//    private class ConnectedThread extends Thread
+//    {
+//        private final InputStream mmInStream;
+//        private final OutputStream mmOutStream;
+//
+//        public ConnectedThread(BluetoothSocket socket)
+//        {
+//            InputStream tmpIn = null;
+//            OutputStream tmpOut = null;
+//            try
+//            {
+//                tmpIn = socket.getInputStream();
+//                tmpOut = socket.getOutputStream();
+//            }
+//            catch (IOException e)
+//            {
+//
+//            }
+//            mmInStream = tmpIn;
+//            mmOutStream = tmpOut;
+//        }
+//
+//        public void run()
+//        {
+//            byte[] byte_in = new byte[50];
+//            // Se mantiene en modo escucha para determinar el ingreso de datos
+//            while (true)
+//            {
+//                try
+//                {
+//                    mmInStream.read(byte_in);
+//                    String cadena = new String(byte_in, 0, 50);
+//                    bluetoothIn.obtainMessage(handlerState, cadena).sendToTarget();
+//                }
+//                catch (IOException e)
+//                {
+//                    break;
+//                }
+//            }
+//        }
+//
+//        //Envio de trama
+//        public void write(String input)
+//        {
+//            try
+//            {
+//                mmOutStream.write(input.getBytes());
+//            }
+//            catch (IOException e)
+//            {
+//                //si no es posible enviar datos se cierra la conexión
+//                //Toast.makeText(getBaseContext(), "La Conexión fallo", Toast.LENGTH_LONG).show();
+//                finish();
+//            }
+//        }
+//
+//        public String read()
+//        {
+//            byte[] buffer = new byte[1024];
+//            try
+//            {
+//                int byteReads = mmInStream.read(buffer);
+//                return new String(buffer, 0, byteReads);
+//            }
+//            catch (IOException e)
+//            {
+//                //si no es posible enviar datos se cierra la conexión
+//                //Toast.makeText(getBaseContext(), "La Conexión fallo", Toast.LENGTH_LONG).show();
+//                finish();
+//            }
+//            return "-1";
+//        }
+//
+//    }
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 }
