@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class ConnectedThread extends Thread{
+    //Crea la clase que permite crear el evento de conexion
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
 
