@@ -61,9 +61,11 @@ public class ConnectedThread extends Thread{
         catch (IOException e)
         {
             //si no es posible enviar datos se cierra la conexión
-            //Toast.makeText(getBaseContext(), "La Conexión fallo", Toast.LENGTH_LONG).show();
-            //finish();
-            return;
+            try {
+                mmOutStream.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -78,8 +80,11 @@ public class ConnectedThread extends Thread{
         catch (IOException e)
         {
             //si no es posible enviar datos se cierra la conexión
-            //Toast.makeText(getBaseContext(), "La Conexión fallo", Toast.LENGTH_LONG).show();
-            //finish();
+            try {
+                mmInStream.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         return "-1";
     }
