@@ -1,13 +1,17 @@
 //Includes
 
 #include <Servo.h>
-#include <SoftwareSerial.h>   // Incluimos la librería  SoftwareSerial  
-SoftwareSerial BT(10,11);
+#include <SoftwareSerial.h>   // Incluimos la librería  SoftwareSerial 
 
 
 // Habilitacion de debug para la impresion por el puerto serial ...
 //----------------------------------------------
 //constantes
+#define RXPIN 10 
+#define TXPIN 11
+
+SoftwareSerial BT(RXPIN,TXPIN);
+
 #define SERIAL_BAUDS 9600
 #define MAX_STATES                    4
 #define MAX_EVENTS                    10
@@ -47,6 +51,7 @@ const int LED_GREEN_PIN =   7;
 
 const int ON = 255;
 const int OFF = 0;
+const int VIOLET = 159;
 
 //HCSR04
 const int DIST_SENSOR_TRIG = 4;
@@ -183,12 +188,12 @@ long timer_actual;
 const int FM_REFRESH_RATE = 2000; // ms
 int lastRefreshTime = 0;
 int lastFlow = 0;
+double actual_water_distance;
 //-----------------------------------------------------
 
 void setup()
 {
   initialize_sistem();
-  DebugPrintEstado(states_s[current_state], events_s[new_event]);
 }
 
 void loop()
@@ -206,14 +211,14 @@ void state_machine()
   {
     if( new_event != EV_CONT )
     {
-      DebugPrintEstado(states_s[current_state], events_s[new_event]);
+	    
     }
     
     state_table_actions[current_state][new_event]();
   }
   else
   {
-    DebugPrintEstado(states_s[ST_SUSPENDED_LOAD], events_s[EV_UNKNOWN]);
+	  
   }
   // Consumo el evento...
   new_event   = EV_CONT;
@@ -226,7 +231,12 @@ void state_machine()
 void initialize_sistem()
 {
   Serial.begin(SERIAL_BAUDS);
+
+  pinMode(RXPIN, INPUT);
+  pinMode(TXPIN, OUTPUT);
+
   BT.begin(9600);  
+
   pinMode(LED_RED_PIN     , OUTPUT);
   pinMode(LED_GREEN_PIN   , OUTPUT);
   pinMode(LED_BLUE_PIN    , OUTPUT);
@@ -237,13 +247,9 @@ void initialize_sistem()
   pinMode(RELAY_PIN       , OUTPUT); 
   pinMode(SOLENOIDE,OUTPUT);
   attachInterrupt(digitalPinToInterrupt(FLOWMETER_PIN), ISRCountPulse, RISING);
-
-  //servo_1.attach(SERVO_1_PIN);
-  //servo_1.write(WATER_GATE_CLOSE_ANGLE);
   
   timeout = false;
   past_time = millis();
-  
   
   current_state = ST_GATE_CLOSED;
   previous_water_distance = get_distance_to_the_water();
@@ -255,12 +261,8 @@ void initialize_sistem()
 
 void get_new_event()
 {
-  DebugPrint("Get new event");
-  double actual_water_distance = TANK_DEPTH - get_distance_to_the_water();
+  actual_water_distance = TANK_DEPTH - get_distance_to_the_water();
   double actual_water_flow = get_water_flow();
-  //Serial.print("WATERFLOW:\n");
-  //Serial.print(actual_water_flow);
-  //Serial.print("--------\n");
   long current_time = millis();
 
   check_bluetooth();
@@ -297,8 +299,6 @@ void get_new_event()
       } 
     } else 
     {
-      Serial.print("-----------------");
-      Serial.print(actual_water_flow);
       new_event = EV_PRESSURE;
     }
   }
@@ -318,17 +318,10 @@ float get_water_flow()
     pulseConter = 0;
     interrupts(); // vuelvo a capturar las interrupciones para contar nuevamente.
     lastRefreshTime = millis();
-    Serial.print("Nuevo Flujo: ");
-    Serial.print(lastFlow);
-    Serial.println("L/min");
   }
-  else{
-    if( millis() - lastRefreshTime >= FM_REFRESH_RATE/3)
-    {
-      Serial.print("Flujo Anterior: ");
-      Serial.print(lastFlow);
-      Serial.println("L/min");
-    }
+  else
+  {
+    
   }
   return lastFlow;
 }
@@ -358,7 +351,6 @@ double get_distance_to_the_water()
   
   double duracion  = pulseIn(DIST_SENSOR_ECHO,HIGH);
   double distancia = (duracion/SOUND_SPEED);
-  
   return distancia;
   
 }
@@ -366,7 +358,6 @@ void none();
 //-----------------------------------------------------
 void show_level()
 {
-  DebugPrint("Show level");
   double actual_water_distance = get_distance_to_the_water();
   
   if (actual_water_distance < LOW_WATER_LEVEL)
@@ -375,7 +366,8 @@ void show_level()
   } else if (actual_water_distance >= LOW_WATER_LEVEL)
   {
     turn_on_green_led();
-  } else {
+  } else 
+  {
     turn_on_red_led();
   }
 }
@@ -385,13 +377,11 @@ void show_level()
 void open_water_gate()
 {
   digitalWrite(SOLENOIDE,HIGH);
-  //servo_1.write(WATER_GATE_OPENING_ANGLE);
   
 }
 void close_water_gate()
 {
   digitalWrite(SOLENOIDE,LOW);
-  //servo_1.write(WATER_GATE_CLOSE_ANGLE);
   
 }
 
@@ -409,14 +399,11 @@ void stop_water_pump()
 
 void error()
 {
-  DebugPrintEstado(states_s[current_state], events_s[new_event]);
-  DebugPrint("Something blew up!");
   if (last_state == ST_PRESSURIZED_LOAD) 
   {
     stop_water_pump();
   }
   drop_service_test_timer();
- // close_water_gate();
   turn_on_white_led();
   current_state = ST_GATE_CLOSED;
 }
@@ -428,7 +415,6 @@ void none()
 //-----------------------------------------------------
 void start_load()
 {
-  DebugPrint("Start Load");
   if (service_timer != NULL && service_timer != 0) 
   {
     drop_service_test_timer();
@@ -440,7 +426,6 @@ void start_load()
 
 void finish_load()
 {
-  DebugPrint("Finish load");
   // Apago la bomba
   if (last_state == ST_PRESSURIZED_LOAD)
   {
@@ -458,7 +443,6 @@ void finish_load()
 //-----------------------------------------------------
 void start_presurized_load()
 {
-  DebugPrint("Start presurized load");
   digitalWrite(SOLENOIDE,HIGH);
   start_water_pump();
   setup_flow_timer();
@@ -469,8 +453,6 @@ void start_presurized_load()
 
 void start_pump_cooldown()
 {
-  DebugPrint("Start water pump cooldown");
-  //open_water_gate();
   stop_water_pump();
   setup_flow_timer();
   setup_pump_timer();
@@ -480,8 +462,6 @@ void start_pump_cooldown()
 
 void handle_hot_pump()
 {
-  DebugPrint("Handle hot pump");
-  //open_water_gate();
   setup_flow_timer();
   turn_on_blue_led();
   current_state = ST_SUSPENDED_LOAD;
@@ -489,8 +469,6 @@ void handle_hot_pump()
 
 void handle_service_down()
 {
-  DebugPrint("Handle service down");
-  //open_water_gate();
   stop_water_pump();
   drop_pump_timer();
   setup_flow_timer();
@@ -501,7 +479,6 @@ void handle_service_down()
 
 void test_service()
 {
-  DebugPrint("Handle test servie");
   start_water_pump();
   drop_service_test_timer();
   setup_flow_timer();
@@ -512,51 +489,50 @@ void test_service()
 
 void drop_pump_timer()
 {
-  DebugPrint("Drop pump timer");
   pump_timer = NULL;
 }
 
 void drop_service_test_timer() 
 {
-  DebugPrint("Drop service test timer");
   service_timer = NULL;
 }
 
 void setup_service_test_timer() 
-{
-  DebugPrint("Setup servcice test timer");
+{ 
   service_timer = millis();
 }
 
 void setup_pump_timer()
 {
-  DebugPrint("Set up pump timer");
   pump_timer = millis();
 }
 
 void drop_flow_timer() 
 {
-  DebugPrint("Drop flow timer");
-  //open_water_gate();
   flow_timer = NULL;
 }
 
 void setup_flow_timer() 
 {
-  DebugPrint("Setup flow timer");
   flow_timer = millis();
 }
 
 void drop_test_timer() 
 {
-  DebugPrint("Drop test timer");
-  //open_water_gate();
+  int flow = get_water_flow();
+  if (flow > MIN_FLOW_EXPECTED)
+  {
+    start_presurized_load();
+  }
+  else
+  {
+    handle_service_down();
+  }
   test_timer = NULL;
 }
 
 void setup_test_timer() 
 {
-  DebugPrint("Setup test timer");
   test_timer = millis();
 }
 
@@ -605,19 +581,21 @@ void Color(int R, int G, int B)
      analogWrite(LED_BLUE_PIN , B) ;    // Blue 
 }
 
-void check_bluetooth(){
+void check_bluetooth()
+{
 
   if(BT.available())    // Si llega un dato por el puerto BT se envía al monitor serial
   {
     char message = BT.read();
     if (message == 'A')
     {
-      Color(159,0,255);//violeta, el usuario ya recibio la informacion
+      Serial.print(message);
+      Color(VIOLET,OFF,ON);//violeta, el usuario ya recibio la informacion
     }
     if (message == 'B')
     {
       char buffer[10] = "";
-      BT.write(dtostrf(get_distance_to_the_water(), 5, 3, buffer));
+      BT.println(dtostrf(actual_water_distance, 5, 3, buffer));
     }
   }
 }

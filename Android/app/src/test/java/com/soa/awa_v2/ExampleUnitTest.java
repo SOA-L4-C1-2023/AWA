@@ -1,4 +1,4 @@
-package com.example.androidapp;
+package com.soa.awa_v2;
 
 import org.junit.Test;
 

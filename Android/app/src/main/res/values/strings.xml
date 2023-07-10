@@ -1,15 +1,18 @@
 <resources>
-    <string name="app_name">AWA - Control de Agua</string>
-    <string name="btnConectar">Conectar a dispositivo BT</string>
-    <string name="lblBomba">Notificar via LED</string>
-    <string name="lblEstado">Estado:</string>
-    <string name="lblNivelDeAgua">Nivel de Agua</string>
-    <string name="txtResultadoEstado">Waiting</string>
-    <string name="txtResultadoNivelDeAgua">0L</string>
-    <string name="imgApagarBomba">Apaga la bomba, independientemente del estado en el que se encuentre</string>
-    <string name="imgObtenerNivelDeAgua">Obtiene el nivel de agua del tanque</string>
-    <string name="imgLogoConexion">Imagen de conexión</string>
-    <string name="icLogoBT">Icono de Bluethoot</string>
-
+    <string name="app_name">AWA</string>
+    <string name="el_nivel_de_agua_actual_en_el_tanque_es_cm">El Nivel de agua actual en el tanque es: (cm)</string>
+    <string name="bienvenidos_al_sistema_awa">Bienvenidos al sistema AWA</string>
+    <string name="manual_uso">Manual de uso:\n\n
+        1- Presiona el botón Nivel de agua para obtener la cantidad de agua en el tanque en cm.\n\n
+        2- Presiona el botón de Notificar para enviar una notificación de recepción de datos al Arduino.\n\n
+        3- Agita el celular (Shake) para realizar la notificación sin presionar ningún botón</string>
+    <string name="button_notificar">Notificar</string>
+    <string name="button_nivel_de_agua">Nivel De Agua</string>
+    <string name="label_shake">Bienvenidos al sistema AWA</string>
+    <string name="label_nivel_de_agua">Bienvenidos al sistema AWA</string>
+    <string name="label_shake_it">🎶🎵Shake, Shake, Shake!🎵🎶</string>
+    <string name="label_dispositivos_encontrados">DISPOSITIVOS ENCONTRADOS</string>
+    <string name="img_logo">LOGO</string>
+    <string name="img_shake_phone">Teléfono siendo agitado</string>
 
 </resources>

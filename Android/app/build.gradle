@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.androidapp'
+    namespace 'com.soa.awa_v2'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.androidapp"
+        applicationId "com.soa.awa_v2"
         minSdk 24
         targetSdk 33
         versionCode 1
