@@ -53,8 +53,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor accelerometer;
     //------------------------------------------
     String nivelDeAgua = "";
+
+    //Constantes y mensajes pre-definidos
     private final String request_led="A";
     private final String request_water_level="B";
+    private final String socket_creation_failed="La creacción del Socket fallo";
+    private final String bt_not_supported="El dispositivo no soporta bluetooth";
+    private final String shake_detected="¡Shake detectado!";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -118,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         catch (IOException e)
         {
-            Toast.makeText(getBaseContext(), "La creacción del Socket fallo", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), socket_creation_failed, Toast.LENGTH_LONG).show();
         }
         // Establece la conexión con el socket Bluetooth.
         try
@@ -202,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     {
         if (btAdapter == null)
         {
-            Toast.makeText(getBaseContext(), "El dispositivo no soporta bluetooth", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), bt_not_supported, Toast.LENGTH_LONG).show();
         }
         else
         {
@@ -237,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             double magnitude = Math.sqrt(x * x + y * y + z * z);
             if (magnitude > 15)
             {
-                Toast.makeText(this, "¡Shake detectado!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, shake_detected, Toast.LENGTH_SHORT).show();
                 MyConexionBT.write(request_led);
             }
         }
@@ -246,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy)
     {
-
+        //Es necesario esto, debido al método, pero en si no le encontramos una funcionalidad concreta
     }
     //Zona del BT
 }
