@@ -99,6 +99,10 @@ const int PUMP_TIMEOUT = 8000; // SECONDS
 const int SERVICE_TIMEOUT = 2500; // SECONDS
 const int FLOW_TIMEOUT = 2000; // MILLISECONDS
 const int TEST_TIMEOUT = 3000; // MILLISECONDS
+
+//Constantes del Bluetooth
+const char NOTIFICATION_LED = 'A';
+const char GET_WATER_LEVEL = 'B';
 //------------------------------------------------------------
 
   // functions
@@ -587,12 +591,12 @@ void check_bluetooth()
   if(BT.available())    // Si llega un dato por el puerto BT se envía al monitor serial
   {
     char message = BT.read();
-    if (message == 'A')
+    if (message == NOTIFICATION_LED)
     {
       Serial.print(message);
       Color(VIOLET,OFF,ON);//violeta, el usuario ya recibio la informacion
     }
-    if (message == 'B')
+    if (message == GET_WATER_LEVEL)
     {
       char buffer[10] = "";
       BT.println(dtostrf(actual_water_distance, 5, 3, buffer));
