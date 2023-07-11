@@ -232,7 +232,7 @@ void initialize_sistem()
   pinMode(RXPIN, INPUT);
   pinMode(TXPIN, OUTPUT);
 
-  BT.begin(9600);  
+  BT.begin(SERIAL_BAUDS);  
 
   pinMode(LED_RED_PIN     , OUTPUT);
   pinMode(LED_GREEN_PIN   , OUTPUT);
