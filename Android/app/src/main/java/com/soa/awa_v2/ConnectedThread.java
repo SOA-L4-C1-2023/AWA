@@ -97,6 +97,4 @@ public class ConnectedThread extends Thread
         }
         return default_error;
     }
-
-
 }
