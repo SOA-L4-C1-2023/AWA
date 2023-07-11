@@ -206,11 +206,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         else
         {
-            if (btAdapter.isEnabled())
-            {
-                //Si esta activado el adaptador, entonces no hay necesidad de hacer algo
-            }
-            else
+            if (!btAdapter.isEnabled())
             {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED)
@@ -224,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     // for ActivityCompat#requestPermissions for more details.
                     startActivityForResult(enableBtIntent, 1);
                 }
-
             }
         }
     }
