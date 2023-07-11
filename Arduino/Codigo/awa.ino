@@ -287,7 +287,8 @@ void get_new_event()
   else if (flow_timer != NULL && flow_timer != TIMER_CERO) 
   {
     new_event = EV_CONT;
-  } else
+  } 
+  else
   {
     if( actual_water_flow < MIN_FLOW_EXPECTED ) 
     {
