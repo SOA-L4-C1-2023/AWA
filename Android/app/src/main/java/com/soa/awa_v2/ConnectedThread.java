@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ConnectedThread extends Thread{
+public class ConnectedThread extends Thread
+{
     //Crea la clase que permite crear el evento de conexion
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
+    private final String default_error="-1";
 
     Handler bluetoothIn;
     private int handlerState = 0;
@@ -62,9 +64,12 @@ public class ConnectedThread extends Thread{
         catch (IOException e)
         {
             //si no es posible enviar datos se cierra la conexión
-            try {
+            try
+            {
                 mmOutStream.close();
-            } catch (IOException ex) {
+            }
+            catch (IOException ex)
+            {
                 throw new RuntimeException(ex);
             }
         }
@@ -81,13 +86,16 @@ public class ConnectedThread extends Thread{
         catch (IOException e)
         {
             //si no es posible enviar datos se cierra la conexión
-            try {
+            try
+            {
                 mmInStream.close();
-            } catch (IOException ex) {
+            }
+            catch (IOException ex)
+            {
                 throw new RuntimeException(ex);
             }
         }
-        return "-1";
+        return default_error;
     }
 
 

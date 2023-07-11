@@ -113,7 +113,8 @@ public class DispositivosVinculados extends AppCompatActivity
         if (mBtAdapter == null)
         {
             Toast.makeText(getBaseContext(), "El dispositivo no soporta Bluetooth", Toast.LENGTH_SHORT).show();
-        } else
+        }
+        else
         {
             if (mBtAdapter.isEnabled())
             {

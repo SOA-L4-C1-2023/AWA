@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor accelerometer;
     //------------------------------------------
     String nivelDeAgua = "";
+    private final String request_led="A";
+    private final String request_water_level="B";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -89,14 +92,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     //Zona del BT
+    @SuppressLint("MissingPermission")
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException
     {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED)
-        {
-
-        }
-        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
         //creates secure outgoing connecetion with BT device using UUID
+        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             catch (IOException e2)
             {
-
+                new RuntimeException(e2);
             }
         }
         MyConexionBT = new ConnectedThread(btSocket,bluetoothIn,handlerState);
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onClick(View v)
             {
                 //Enviamos la letra para prender led al arduino
-                MyConexionBT.write("A");
+                MyConexionBT.write(request_led);
             }
         }
         );
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onClick(View v)
             {
-                MyConexionBT.write("B");
+                MyConexionBT.write(request_water_level);
             }
         }
         );
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         catch (IOException e2)
         {
-
+            new RuntimeException(e2);
         }
     }
 
@@ -200,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     //está disponible y solicita que se active si está desactivado
     private void VerificarEstadoBT()
     {
-
         if (btAdapter == null)
         {
             Toast.makeText(getBaseContext(), "El dispositivo no soporta bluetooth", Toast.LENGTH_LONG).show();
@@ -209,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         {
             if (btAdapter.isEnabled())
             {
-
+                //Si esta activado el adaptador, entonces no hay necesidad de hacer algo
             }
             else
             {
@@ -244,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (magnitude > 15)
             {
                 Toast.makeText(this, "¡Shake detectado!", Toast.LENGTH_SHORT).show();
-                MyConexionBT.write("A");
+                MyConexionBT.write(request_led);
             }
         }
     }
